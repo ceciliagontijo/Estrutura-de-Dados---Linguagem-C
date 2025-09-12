@@ -101,7 +101,7 @@ void imprime_prox(Fila *f)
     No* aux = f->ini;
     printf("\n%s | ", aux->info.nome);
     printf("%s | ", aux->info.especie);
-    printf("%d ", aux->info.prior);
+    printf("%d | ", aux->info.prior);
 }
 
 int busca(Fila *f, char nome[50])
@@ -114,15 +114,16 @@ int busca(Fila *f, char nome[50])
             printf("\nO animal buscado está cadastrado!");
             printf("\n%s | ", aux->info.nome);
             printf("%s | ", aux->info.especie);
-            printf("%d ", aux->info.prior);
+            printf("%d | ", aux->info.prior);
             return 1;
         }
         else
         {
             aux = aux->prox;
-            return 0;
+            //return 0;
         }
     }
+    return 0;
 }
 
 void imprime(Fila *f)
@@ -144,9 +145,11 @@ int main()
     Fila* emerg;
     Fila* normal;
     Fila* atendidos;
+    Fila* geral;
     emerg = CriaFila();
     normal = CriaFila();
     atendidos = CriaFila();
+    geral = CriaFila();
     int num, id, idade, prior, dia, mes, ano, busca_resul;
     char nome[50], buscado[50];
     char especie[30];
@@ -194,6 +197,7 @@ int main()
                 {
                     insere(normal, nome, idade, especie, prior, dia, mes, ano);
                 }
+                    insere(geral, nome, idade, especie, prior, dia, mes, ano);
                 break;
             case 2:
                 if (vaziaFila(emerg)==1)
@@ -208,12 +212,22 @@ int main()
              case 3:
                 printf("\nNome do animal que deseja buscar: ");
                 scanf("%s", buscado);
-                busca_resul = busca(normal, buscado);
-                busca_resul = busca(emerg, buscado);
-                busca_resul = busca(atendidos, buscado); //adicionar uma variavel p dizer se o animal ja foi ou nao atendido
+                busca_resul = busca(geral, buscado);
                 if (busca_resul == 0)
                 {
                     printf("\nO animal procurado não está cadastrado.");
+                }
+                else
+                {
+                    busca_resul = busca(atendidos, buscado);
+                    if (busca_resul==1)
+                    {
+                        printf("Já foi atendido");
+                    }
+                    else
+                    {
+                        printf("Não foi atendido");
+                    }
                 }
                  break;
              case 4:

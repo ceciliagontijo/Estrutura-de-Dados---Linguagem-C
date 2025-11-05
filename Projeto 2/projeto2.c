@@ -57,8 +57,14 @@ int particao(item *v, int LI, int LS)
     pivo=v[e].chave;
     while(e < d)
     {
-        while((v[e].chave>=pivo)&& (e<LS)) { e++;}
-        while((v[d].chave<pivo)&&(d>LI)) {d--;}
+        while((v[e].chave>=pivo)&& (e<LS))
+            {
+                e++;
+            }
+        while((v[d].chave<pivo)&&(d>LI))
+        {
+            d--;
+        }
         if(e<d)
         {
             aux = v[e].chave; v[e].chave=v[d].chave; v[d].chave=aux;
@@ -84,21 +90,29 @@ void quicksort(item *v, int LI, int LS)
 int main()
 {
     int i;
-    int TAM=15;
+    int TAM=500000;
     item *vetor = malloc(TAM * sizeof *vetor);
+
     clock_t inicio, fim;
-    double tempo_insercao, tempo_quick;
+    float tempo_insercao, tempo_quick;
 
-    geraVetorAleatorio(vetor, TAM, 800);
-
+    geraVetorAleatorio(vetor, TAM, 1260);
+    inicio = clock();
     insercao(vetor,TAM);
-    quicksort(vetor,0,TAM-1);
-    printf("\n\n\n\n");
-    for (i = 0; i < TAM; i++) {
-        printf("Chave %d: %d\n",i, vetor[i].chave);
-    }
+    fim = clock();
+    //quicksort(vetor,0,TAM-1);
+    //printf("\n\n\n\n");
+    //for (i = 0; i < TAM; i++) {
+       // printf("Chave %d: %d\n",i, vetor[i].chave);
+    //}
+    tempo_insercao = (float)(fim - inicio) / CLOCKS_PER_SEC;
+
+    // Exibindo o tempo de execução
+    printf("Tempo de execução: %.6f segundos\n", tempo_insercao);
     free(vetor);
     vetor = NULL;
     return 0;
 }
+
+
 

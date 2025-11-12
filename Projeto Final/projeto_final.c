@@ -127,16 +127,29 @@ void BuscaVendas(NoArv *pai, char vendedor[50])
     }
 }
 
-void InOrder(NoArv *pai)
+void Decrescente(NoArv *pai)
 {
       if (pai->dir != NULL)
     {
-        InOrder(pai->dir);
+        Decrescente(pai->dir);
     }
     imprime(pai->info);
     if (pai->esq != NULL)
     {
-        InOrder(pai->esq);
+        Decrescente(pai->esq);
+    }
+}
+
+void Crescente(NoArv *pai)
+{
+      if (pai->esq != NULL)
+    {
+        Decrescente(pai->esq);
+    }
+    imprime(pai->info);
+    if (pai->dir != NULL)
+    {
+        Decrescente(pai->dir);
     }
 }
 
@@ -228,7 +241,7 @@ int main ()
     Arv *a1;
     a1 = CriaArvore();
     Dados A;
-    int num, num2, total_vendas;
+    int num, num2, total_vendas, ordem;
     float valor, faturamento;
     char buscado[50];
 
@@ -296,8 +309,17 @@ int main ()
 
                 break;
 
-            case 2:
-                InOrder(a1->raiz);
+            case 2: // fazer do while pra só conseguir responder 1 e 2
+                printf("\nDeseja imprimir em ordem crescente (1) ou em ordem descrescente (2)? ");
+                scanf("%d", &ordem);
+                if(ordem == 1)
+                {
+                    Crescente(a1->raiz);
+                }
+                else
+                {
+                    Decrescente(a1->raiz);
+                }
                 break;
 
             case 3: // imprimir mensagem quando o vendedor nao tem nenhuma venda

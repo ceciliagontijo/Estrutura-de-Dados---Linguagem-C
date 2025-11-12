@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct data
 {
@@ -19,7 +20,7 @@ typedef struct dados
 
 typedef struct NoArvore
 {
-    int info;
+    Dados info;
     struct NoArvore *dir;
     struct NoArvore *esq;
 }NoArv;
@@ -56,7 +57,7 @@ void insere(Arv *a1, Dados d)
     NoArv *pai=a1->raiz;
     int flag=0;
     novo = (NoArv*) malloc(sizeof(NoArv));
-    novo->info = d.id;
+    novo->info = d;
     novo->dir = NULL;
     novo->esq = NULL;
     if (a1->raiz == NULL)
@@ -68,7 +69,7 @@ void insere(Arv *a1, Dados d)
     {
         while (flag==0)
         {
-            if (d.id > pai->info)
+            if (d.id > pai->info.id)
             {
                 if (pai->dir != NULL)
                 {
@@ -96,26 +97,125 @@ void insere(Arv *a1, Dados d)
     }
 }
 
-void imprime(Dados pai)
+void imprime(Dados d)
 {
-    printf("%d ", pai->info.id);
-    printf("%s | ", pai->info.vendedor);
-    printf("%s | ", pai->info.cliente);
-    printf("%d/%d/%d | ", pai->info.trans.dia, pai->info.trans.mes, pai->info.trans.ano);
-    printf("%d ", pai->info.valor);
+    printf("\n\n");
+    printf("%d ", d.id);
+    printf("%s | ", d.vendedor);
+    printf("%s | ", d.cliente);
+    printf("%d/%d/%d | ", d.trans.dia, d.trans.mes, d.trans.ano);
+    printf("%.2f ", d.valor);
 }
 
-void Preorder(NoArv *pai)
+void BuscaVendas(NoArv *pai, char vendedor[50])
 {
     if (pai->dir != NULL)
     {
-        Preorder(pai->dir);
+        BuscaVendas(pai->dir, vendedor);
+    }
+    if (pai->esq != NULL)
+    {
+        BuscaVendas(pai->esq, vendedor);
+    }
+    if(strcmp(pai->info.vendedor, vendedor)==0)
+    {
+        printf("\n\n");
+        printf("%d ", pai->info.id);
+        printf("%s | ", pai->info.cliente);
+        printf("%d/%d/%d | ", pai->info.trans.dia, pai->info.trans.mes, pai->info.trans.ano);
+        printf("%.2f ", pai->info.valor);
+    }
+}
+
+void InOrder(NoArv *pai)
+{
+      if (pai->dir != NULL)
+    {
+        InOrder(pai->dir);
     }
     imprime(pai->info);
     if (pai->esq != NULL)
     {
-        Preorder(pai->esq);
+        InOrder(pai->esq);
     }
+}
+
+void ValoresAbaixo(NoArv *pai, float num)
+{
+     if (pai->dir != NULL)
+    {
+        ValoresAbaixo(pai->dir, num);
+    }
+    if (pai->esq != NULL)
+    {
+        ValoresAbaixo(pai->esq, num);
+    }
+    if(pai->info.valor < num)
+    {
+        printf("\n\n");
+        printf("%d ", pai->info.id);
+        printf("%s | ", pai->info.vendedor);
+        printf("%s | ", pai->info.cliente);
+        printf("%d/%d/%d | ", pai->info.trans.dia, pai->info.trans.mes, pai->info.trans.ano);
+        printf("%.2f ", pai->info.valor);
+    }
+}
+
+void ValoresAcima(NoArv *pai, float num)
+{
+     if (pai->dir != NULL)
+    {
+        ValoresAcima(pai->dir, num);
+    }
+    if (pai->esq != NULL)
+    {
+        ValoresAcima(pai->esq, num);
+    }
+    if(pai->info.valor > num)
+    {
+        printf("\n\n");
+        printf("%d ", pai->info.id);
+        printf("%s | ", pai->info.vendedor);
+        printf("%s | ", pai->info.cliente);
+        printf("%d/%d/%d | ", pai->info.trans.dia, pai->info.trans.mes, pai->info.trans.ano);
+        printf("%.2f ", pai->info.valor);
+    }
+}
+
+int TotalVendas (NoArv *pai)
+{
+    int cont = 1;
+    if(pai == NULL)
+    {
+        return 0;
+    }
+    if (pai->dir != NULL)
+    {
+        cont = cont + TotalVendas(pai->dir);
+    }
+    if(pai->esq != NULL)
+    {
+        cont = cont + TotalVendas(pai->esq);
+    }
+    return cont;
+}
+
+float TotalFaturamento (NoArv *pai)
+{
+    float soma = pai->info.valor;
+    if(pai == NULL)
+    {
+        return 0;
+    }
+    if(pai->dir != NULL)
+    {
+        soma = soma + TotalFaturamento(pai->dir);
+    }
+    if(pai->esq != NULL)
+    {
+        soma = soma + TotalFaturamento(pai->esq);
+    }
+    return soma;
 }
 
 int gera (void)
@@ -125,11 +225,12 @@ int gera (void)
 
 int main ()
 {
-    //setlocale(LC_ALL, "portuguese");
     Arv *a1;
     a1 = CriaArvore();
     Dados A;
-    int num;
+    int num, num2, total_vendas;
+    float valor, faturamento;
+    char buscado[50];
 
      do {
             do {
@@ -138,15 +239,14 @@ int main ()
                 printf("-----------------------------------------------------\n\n");
                 printf("1. Insira uma nova venda.\n\n");
                 printf("2. Imprimir todas as vendas.\n\n");
-                printf("3. Buscar um pet.\n\n");
-                printf("4. Imprimir relatorio dos pets na fila.\n\n");
-                printf("5. Imprimir proximo pet a ser atendido. \n\n");
-                printf("6. Imprimir todos os pets que ja foram atendidos. \n\n");
+                printf("3. Buscar as vendas de um determinado vendedor.\n\n");
+                printf("4. Visualizar as vendas acima ou abaixo de um determinado valor.\n\n");
+                printf("5. Visualizar estatisticas das vendas. \n\n");
+                printf("6. Remover uma venda. \n\n");
                 printf("7. Finalizar o sistema. \n\n");
                 printf("-----------------------------------------------------\n\n");
                 printf("Insira sua opcao: ");
                 scanf("%d", &num);
-                limpa();
                 } while (num<1 || num>7);
 
         switch (num) {
@@ -159,13 +259,13 @@ int main ()
                 A.id = gera();
                 printf("\nID da venda: %d", A.id);
 
-                printf("\n\nNome do cliente: ");
-                scanf("%s", A.cliente);
-
                 printf("\n\nNome do vendedor: ");
                 scanf("%s", A.vendedor);
 
-                printf("\nData da transação: ");
+                printf("\n\nNome do cliente: ");
+                scanf("%s", A.cliente);
+
+                printf("\nData da transacao: ");
                 printf("\n Dia: ");
                 scanf("%d", &A.trans.dia);
                 while (A.trans.dia < 1 || A.trans.dia > 31)
@@ -184,12 +284,12 @@ int main ()
                 scanf("%d", &A.trans.ano);
                 while (A.trans.ano > 2025)
                 {
-                    printf(" Valor invalido, digite novamente: ");
+                    printf("Valor invalido, digite novamente: ");
                     scanf("%d", &A.trans.ano);
                 }
 
-                printf("\nValor da transação: ");
-                scanf("%d", &A.valor);
+                printf("\nValor da transacao: ");
+                scanf("%f", &A.valor);
 
 
                 insere(a1, A);
@@ -197,87 +297,39 @@ int main ()
                 break;
 
             case 2:
-
+                InOrder(a1->raiz);
                 break;
 
-            case 3:
-                do
-                {
-                printf("\nComo deseja buscar? [1: ID | 2: Nome]: ");
-                    scanf("%d", &b);
-                        if(b==1)
-                        {
-                            printf(" ID do animal que deseja buscar: ");
-                            scanf("%d", &buscado1);
-                            busca_resul = buscaid(geral, buscado1);
-                        }
-                        else if(b==2)
-                        {
-                            printf(" Nome do animal que deseja buscar: ");
-                            scanf("%s", buscado);
-                            busca_resul = buscanome(geral, buscado);
-                        }
-                        else
-                        {
-                            printf("Opcao invalida, digite novamente: ");
-                        }
-                } while(b<1 || b>2);
-
-                if (busca_resul == 0)
-                {
-                    printf("\nO animal procurado nao esta cadastrado.");
-                }
-                fflush(stdin);
-                getchar();
-                limpa();
+            case 3: // imprimir mensagem quando o vendedor nao tem nenhuma venda
+                printf("Nome do vendedor que deseja buscar as vendas: ");
+                scanf("%s", buscado);
+                BuscaVendas(a1->raiz, buscado);
                 break;
 
-            case 4:
-                printf("Relatorio dos pets");
-                printf("\n------------------------------------------------------");
-
-                if(vaziaFila(emerg)==1)
+            case 4: // imprimir mensagem quando nao tem nenhuma venda abaixo ou acima
+                printf("Digite o valor: ");
+                scanf("%f", &valor);
+                printf("Qual lista deseja visualizar:");
+                printf("\n1 - Lista de vendas abaixo do valor");
+                printf("\n2 - Lista de vendas acima do valor\n");
+                scanf("%d", &num2);
+                // fazer do while pra sÃ³ conseguir responder 1 e 2
+                if(num2==1)
                 {
-                    printf("\nNao ha pets na fila de emergencia ;)");
+                    ValoresAbaixo(a1->raiz, valor);
                 }
                 else
                 {
-                    imprime(emerg);
+                    ValoresAcima(a1->raiz, valor);
                 }
-                printf("\n");
-                if(vaziaFila(normal)==1)
-                {
-                    printf("\nNao ha pets na fila normal ;)");
-                }
-                else
-                {
-                    imprime(normal);
-                }
-                limpa();
+
                 break;
 
             case 5:
-                if (vaziaFila(emerg)==1)
-                {
-                    imprime_prox(normal);
-                }
-                else
-                {
-                    imprime_prox(emerg);
-                }
-                limpa();
-                break;
-            case 6:
-                if (vaziaFila(atendidos)==1)
-                {
-                    printf("Nenhum pet foi atendido.");
-                }
-                else
-                {
-                    imprime(atendidos);
-                }
-                limpa();
-                break;
+                total_vendas = TotalVendas(a1->raiz);
+                printf("\nNumero total de vendas = %d", total_vendas);
+                faturamento = TotalFaturamento(a1->raiz);
+                printf("\nSoma total do faturamento = %.2f", faturamento);
 
         }
     } while (num!=7);

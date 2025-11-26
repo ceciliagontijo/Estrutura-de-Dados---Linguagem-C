@@ -21,6 +21,19 @@ Arv* CriaArvore(void)
     return aux;
 }
 
+int ArvVazia(Arv *arv)
+{
+    if (arv->raiz == NULL)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+
+}
+
 void insere(Arv *a1, int num)
 {
     NoArv *novo;
@@ -72,39 +85,6 @@ void imprime(int num)
     printf("%d ", num);
 }
 
-int buscaele(NoArv *pai, int num)
-{
-    while (1)
-    {
-        if (pai->info == num)
-        {
-            return 1;
-        }
-        if (num > pai->info)
-        {
-            if (pai->dir != NULL)
-            {
-                pai = pai->dir;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-        if (num < pai->info)
-        {
-            if (pai->esq != NULL)
-            {
-                pai = pai->esq;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-    }
-}
-
 void Preorder(NoArv *pai)
 {
     imprime(pai->info);
@@ -118,44 +98,54 @@ void Preorder(NoArv *pai)
     }
 }
 
-int quant (NoArv *pai, int num, int cont)
+int Busca(NoArv *pai, int num, int cont)
 {
-    if (pai->info > num)
+    if (pai->info == num)
     {
-        cont++;
+        cont = 1;
     }
     if (pai->dir != NULL)
     {
-        cont = quant (pai->dir, num, cont);
+        cont = Busca(pai->dir, num, cont);
     }
     if (pai->esq != NULL)
     {
-        cont = quant (pai->esq, num, cont);
+        cont = Busca(pai->esq, num, cont);
     }
-    return cont;
+
+        return cont;
 
 }
-int main()
-{
+
+int main() {
     Arv *a1;
     a1 = CriaArvore();
-    int N, num, valor, qnt, cont=0;
+
+    int num, valor, resul=0, num2, cont=0;
     printf("Quantidade de elementos: ");
-    scanf("%d", &N);
-    while (N>0)
+    scanf("%d", &num);
+    while (num>0)
     {
         printf("\nElemento = ");
         scanf("%d", &valor);
         insere(a1, valor);
-        N--;
+        num--;
     }
     Preorder(a1->raiz);
 
-    printf("\nValor: ");
-    scanf("%d", &num);
+    printf("\nValor que deseja buscar na árvore: ");
+    scanf("%d", &num2);
 
-    qnt = quant(a1->raiz, num, cont);
+    resul = Busca(a1->raiz, num2, cont);
 
-    printf("\nQuantidade de nós maior que %d = %d", num, qnt);
-return 0;
+    if (resul==1)
+    {
+        printf("\nO elemento %d existe na árvore.", num2);
+    }
+    else
+    {
+        printf("\nO elemento %d NÃO existe na árvore.", num2);
+    }
+
+    return 0;
 }

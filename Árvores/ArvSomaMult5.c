@@ -21,6 +21,19 @@ Arv* CriaArvore(void)
     return aux;
 }
 
+int ArvVazia(Arv *arv)
+{
+    if (arv->raiz == NULL)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+
+}
+
 void insere(Arv *a1, int num)
 {
     NoArv *novo;
@@ -72,39 +85,6 @@ void imprime(int num)
     printf("%d ", num);
 }
 
-int buscaele(NoArv *pai, int num)
-{
-    while (1)
-    {
-        if (pai->info == num)
-        {
-            return 1;
-        }
-        if (num > pai->info)
-        {
-            if (pai->dir != NULL)
-            {
-                pai = pai->dir;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-        if (num < pai->info)
-        {
-            if (pai->esq != NULL)
-            {
-                pai = pai->esq;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-    }
-}
-
 void Preorder(NoArv *pai)
 {
     imprime(pai->info);
@@ -118,44 +98,72 @@ void Preorder(NoArv *pai)
     }
 }
 
-int quant (NoArv *pai, int num, int cont)
+int Busca(NoArv *pai, int num) // recursiva
 {
-    if (pai->info > num)
+    if (pai->info == num)
     {
-        cont++;
+        return 1;
+    }
+    if (num > pai->info)
+    {
+        if (pai->dir != NULL)
+        {
+            return Busca(pai->dir, num);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    if (num < pai->info)
+    {
+        if (pai->esq != NULL)
+        {
+            return Busca(pai->esq, num);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+}
+
+int Soma(NoArv *pai)
+{
+    int soma=0;
+    if (pai->info % 5 == 0)
+    {
+        soma = pai->info;
     }
     if (pai->dir != NULL)
     {
-        cont = quant (pai->dir, num, cont);
+        soma =  soma + Soma(pai->dir);
     }
     if (pai->esq != NULL)
     {
-        cont = quant (pai->esq, num, cont);
+        soma = soma + Soma(pai->esq);
     }
-    return cont;
-
+    return soma;
 }
+
+
+
 int main()
 {
     Arv *a1;
     a1 = CriaArvore();
-    int N, num, valor, qnt, cont=0;
+    int num, valor, soma;
     printf("Quantidade de elementos: ");
-    scanf("%d", &N);
-    while (N>0)
+    scanf("%d", &num);
+    while (num>0)
     {
         printf("\nElemento = ");
         scanf("%d", &valor);
         insere(a1, valor);
-        N--;
+        num--;
     }
     Preorder(a1->raiz);
+    soma = Soma(a1->raiz);
+    printf("\nSoma nós múltiplos de 5: %d", soma);
 
-    printf("\nValor: ");
-    scanf("%d", &num);
-
-    qnt = quant(a1->raiz, num, cont);
-
-    printf("\nQuantidade de nós maior que %d = %d", num, qnt);
-return 0;
 }

@@ -1,0 +1,185 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct NoArvore
+{
+    int info;
+    struct NoArvore *dir;
+    struct NoArvore *esq;
+}NoArv;
+
+typedef struct Arvore
+{
+    NoArv *raiz;
+}Arv;
+
+Arv* CriaArvore(void)
+{
+    Arv *aux;
+    aux = (Arv*) malloc(sizeof(Arv));
+    aux->raiz = NULL;
+    return aux;
+}
+
+int ArvVazia(Arv *arv)
+{
+    if (arv->raiz == NULL)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+
+}
+
+void insere(Arv *a1, int num)
+{
+    NoArv *novo;
+    NoArv *pai=a1->raiz;
+    int flag=0;
+    novo = (NoArv*) malloc(sizeof(NoArv));
+    novo->info = num;
+    novo->dir = NULL;
+    novo->esq = NULL;
+    if (a1->raiz == NULL)
+    {
+        a1->raiz = novo;
+        return;
+    }
+    else
+    {
+        while (flag==0)
+        {
+            if (num > pai->info)
+            {
+                if (pai->dir != NULL)
+                {
+                    pai = pai->dir;
+                }
+                else
+                {
+                    pai->dir = novo;
+                    flag=1;
+                }
+            }
+            else
+            {
+                if (pai->esq != NULL)
+                {
+                    pai = pai->esq;
+                }
+                else
+                {
+                    pai->esq = novo;
+                    flag=1;
+                }
+            }
+        }
+    }
+}
+
+void imprime(int num)
+{
+    printf("%d ", num);
+}
+
+void Preorder(NoArv *pai)
+{
+    imprime(pai->info);
+    if (pai->dir != NULL)
+    {
+        Preorder(pai->dir);
+    }
+    if (pai->esq != NULL)
+    {
+        Preorder(pai->esq);
+    }
+}
+
+Arv* Intersecao (NoArv *pai1, NoArv *pai2, Arv *resul)
+{
+    int flag=0;
+    if (pai1->dir != NULL)
+    {
+        resul = Intersecao(pai1->dir, pai2, resul);
+    }
+    if (pai1->esq != NULL)
+    {
+        resul = Intersecao(pai1->esq, pai2, resul);
+    }
+    while (flag == 0)
+    {
+        if (pai1->info == pai2->info)
+        {
+            insere(resul, pai1->info);
+            flag = 1;
+        }
+        else
+        {
+            if (pai1->info > pai2->info)
+            {
+                if (pai2->dir != NULL)
+                {
+                    pai2 = pai2->dir;
+                }
+                else
+                {
+                    flag = 1;
+                }
+            }
+            if (pai1->info < pai2->info)
+            {
+                if (pai2->esq != NULL)
+                {
+                    pai2 = pai2->esq;
+                }
+                else
+                {
+                    flag = 1;
+                }
+            }
+        }
+    }
+
+    return resul;
+}
+
+int main() {
+    Arv *a1;
+    Arv *a2;
+    a1 = CriaArvore();
+    a2 = CriaArvore();
+    Arv *resul;
+    resul = CriaArvore();
+    int num, valor, quant=0;
+    int *cont = 0;
+    printf("Quantidade de elementos: ");
+    scanf("%d", &num);
+    while (num>0)
+    {
+        printf("\nElemento = ");
+        scanf("%d", &valor);
+        insere(a1, valor);
+        num--;
+    }
+    Preorder(a1->raiz);
+    printf("\nQuantidade de elementos: ");
+    scanf("%d", &num);
+    while (num>0)
+    {
+        printf("\nElemento = ");
+        scanf("%d", &valor);
+        insere(a2, valor);
+        num--;
+    }
+    Preorder(a2->raiz);
+
+    resul = Intersecao(a1->raiz, a2->raiz, resul);
+
+    printf("\n\n");
+    Preorder(resul->raiz);
+
+    return 0;
+}

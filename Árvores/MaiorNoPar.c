@@ -106,11 +106,11 @@ int MaiorPar (NoArv *pai, int maior)
     }
     if (pai->dir != NULL)
     {
-        return MaiorPar(pai->dir, maior);
+        maior = MaiorPar(pai->dir, maior);
     }
     if (pai->esq != NULL)
     {
-        return MaiorPar(pai->esq, maior);
+        maior = MaiorPar(pai->esq, maior);
     }
     return maior;
 }

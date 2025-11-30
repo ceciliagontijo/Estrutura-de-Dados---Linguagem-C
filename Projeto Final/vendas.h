@@ -4,8 +4,10 @@
 #include <string.h>
 #include <ctype.h>
 
-
-
+void tab()
+{
+    printf("\t\t\t");
+}
 
 typedef struct data
 {
@@ -103,22 +105,27 @@ void insere(Arv *a1, Dados d)
     }
 }
 
-void imprime(Dados d)
+//imprime os titulos da tabela
+void header()
 {
-    printf("\n\n");
-    // ID (Alinha à esquerda em um campo de largura 5)
-    printf("%d ", d.id);
-    // Vendedor (Alinha à esquerda em um campo de largura 20)
-    printf("%-20s | ", d.vendedor);
-    // Cliente (Alinha à esquerda em um campo de largura 20)
-    printf("%-20s | ", d.numvendedor);
-    printf("%-20s | ", d.cliente);
-    // Data (Alinhamento manual: use %02d para garantir 2 dígitos na data)
-    printf("%02d/%02d/%04d | ", d.trans.dia, d.trans.mes, d.trans.ano);
-    // Valor (Alinha à esquerda em um campo de largura 10, com 2 casas decimais)
-    printf("R$%-10.2f ", d.valor);
+    printf("| ID  | ");
+    printf("%-50s | ", "VENDEDOR");
+    printf("| COD |");
+    printf("%-50s | ", "CLIENTE");
+    printf("DATA       | ");
+    printf("VALOR      |\n");
 }
 
+//imprime os cadastros
+void imprime(Dados d)
+{
+    printf("%4d | ", d.id);
+    printf("%-30s | ", d.vendedor);
+    printf("%-4s | ", d.numvendedor);
+    printf("%-30s | ", d.cliente);
+    printf("%02d/%02d/%04d | ", d.trans.dia, d.trans.mes, d.trans.ano);
+    printf("R$%-10.2f |\n", d.valor);
+}
 
 NoArv* remover_aux(NoArv *pai, int num)
 {
@@ -195,7 +202,7 @@ Arv* remover(Arv *RAIZ, int num)
     return RAIZ;
 }
 
-void BuscaVendas(NoArv *pai, char busca[50])
+void BuscaVendas(NoArv *pai, char busca[], int *Vendas)
 {
     if (pai==NULL)
     {
@@ -203,14 +210,15 @@ void BuscaVendas(NoArv *pai, char busca[50])
     }
     if (pai->dir != NULL)
     {
-        BuscaVendas(pai->dir, busca);
+        BuscaVendas(pai->dir, busca, Vendas);
     }
     if (pai->esq != NULL)
     {
-        BuscaVendas(pai->esq, busca);
+        BuscaVendas(pai->esq, busca, Vendas);
     }
     if(strcmp(pai->info.vendedor,busca)==0)
     {
+        (*Vendas) = 1;
         printf("\n\n");
         printf("%d ", pai->info.id);
         printf("%s | ", pai->info.cliente);
@@ -219,10 +227,27 @@ void BuscaVendas(NoArv *pai, char busca[50])
     }
 }
 
+int BuscaID(NoArv *pai, int id, int resul)
+{
+    if(pai->info.id == id)
+    {
+        resul = 1;
+    }
+    if (pai->dir != NULL)
+    {
+        resul = BuscaID(pai->dir, id, resul);
+    }
+    if (pai->esq != NULL)
+    {
+        resul = BuscaID(pai->esq, id, resul);
+    }
+    return resul;
+}
+
 
 void Decrescente(NoArv *pai)
 {
-      if (pai->dir != NULL)
+    if (pai->dir != NULL)
     {
         Decrescente(pai->dir);
     }
@@ -246,18 +271,19 @@ void Crescente(NoArv *pai)
     }
 }
 
-void ValoresAbaixo(NoArv *pai, float num)
+void ValoresAbaixo(NoArv *pai, float num, int *valores)
 {
      if (pai->dir != NULL)
     {
-        ValoresAbaixo(pai->dir, num);
+        ValoresAbaixo(pai->dir, num, valores);
     }
     if (pai->esq != NULL)
     {
-        ValoresAbaixo(pai->esq, num);
+        ValoresAbaixo(pai->esq, num, valores);
     }
     if(pai->info.valor < num)
     {
+        (*valores) = 1;
         printf("\n\n");
         printf("%d ", pai->info.id);
         printf("%-20s | ", pai->info.vendedor);
@@ -268,18 +294,19 @@ void ValoresAbaixo(NoArv *pai, float num)
     }
 }
 
-void ValoresAcima(NoArv *pai, float num)
+void ValoresAcima(NoArv *pai, float num, int *valores)
 {
      if (pai->dir != NULL)
     {
-        ValoresAcima(pai->dir, num);
+        ValoresAcima(pai->dir, num, valores);
     }
     if (pai->esq != NULL)
     {
-        ValoresAcima(pai->esq, num);
+        ValoresAcima(pai->esq, num, valores);
     }
     if(pai->info.valor > num)
     {
+        (*valores) = 1;
         printf("\n\n");
         printf("%d ", pai->info.id);
         printf("%-20s | ", pai->info.vendedor);
